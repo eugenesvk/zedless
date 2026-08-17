@@ -478,6 +478,8 @@ def nullifyIfStatement(target, conditionPattern: str | list[str], selectElse=Tru
 from pathlib      import Path
 args = parser.parse_args()
 import shutil
+import os
+dir_main = os.path.dirname(os.path.realpath(__file__))
 with chdir(args.src):
     rules = []
 
@@ -1302,6 +1304,8 @@ with chdir(args.src):
 
     runRules(rules)
 
-    run([
-        "cp", "-r", "../overlay/.", "."
-    ]).check_returncode()
+    src = Path(dir_main) / 'overlay' / '.'
+    tgt = Path(args.src)
+    if args.verbose:
+        print(f"  {src}\n →{tgt}")
+    shutil.copytree(src,tgt,dirs_exist_ok=True)
