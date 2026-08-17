@@ -12,6 +12,13 @@ import toml
 import match
 import match.rust
 
+import argparse
+parser = argparse.ArgumentParser(
+    prog       ='Zedless Patch',
+    description='Patches Zed with focus on privacy and being local-first',
+    epilog     ='')
+parser.add_argument('-s','--src',type=str,default="source",help="Path of the Zed's source code")
+
 @contextmanager
 def editTomlDocument(file):
     def callback(v):
@@ -467,8 +474,8 @@ def nullifyIfStatement(target, conditionPattern: str | list[str], selectElse=Tru
             for pattern in conditionPattern
         ])
 
-
-with chdir("source"):
+args = parser.parse_args()
+with chdir(args.src):
     rules = []
 
     cratesToDelete = []
