@@ -209,23 +209,6 @@ CONFIG.perDirectory = {
             "TelemetrySpawnLocation",
         ],
         stringReplacements=[
-            ("../lib/zed/zed-editor", "../lib/zedless/zedless-editor"),
-            ("../libexec/zed-editor", "../libexec/zedless-editor"),
-            ("/app/libexec/zed-editor", "/app/libexec/zedless-editor"),
-            ("Open Zed Log", "Open Zedless Log"),
-            ("Welcome to Zed", "Welcome to Zedless"),
-            ("Welcome back to Zed", "Welcome back to Zedless"),
-            ("Zed (Default)", "Zedless (Default)"),
-            ("Zed Default", "Zedless Default"),
-            ("Zed Dev", "Zedless Dev"),
-            ("Zed Nightly", "Zedless Nightly"),
-            ("Zed Preview", "Zedless Preview"),
-            ("Zed", "Zedless"),
-            ("dev.zed.Zed", "org.zedless.Zedless"),
-            ("dev.zed.Zed-Dev", "org.zedless.Zedless-Dev"),
-            ("dev.zed.Zed-Nightly", "org.zedless.Zedless-Nightly"),
-            ("dev.zed.Zed-Preview", "org.zedless.Zedless-Preview"),
-            ("zed-editor", "zedless-editor"),
         ]
     ),
     "crates/activity_indicator/": PerDirectoryConfig(
@@ -339,7 +322,6 @@ CONFIG.perDirectory = {
     ),
     "crates/cli/":  PerDirectoryConfig(
         stringReplacements=[
-            ("zed", "zedless")
         ]
     ),
     "crates/client/": PerDirectoryConfig(
