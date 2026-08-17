@@ -60,7 +60,7 @@ CONFIG.bannedCrates = [
     # Collab
     "collab","collab_ui",
     "livekit_api","livekit_client",
-    "audio","denoise","rodio",
+    "audio","denoise","rodio","call",
     "channel",
     "webrtc","aws_http_client","bedrock",
 
