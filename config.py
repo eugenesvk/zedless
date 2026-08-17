@@ -125,6 +125,7 @@ CONFIG.bannedModules = [
     ("web_search_providers", "cloud"),
     ("zed", "reliability"),
     ("zed", "telemetry_log"),
+    ("zed_actions", "feedback"),
 ]
 
 CONFIG.bannedLanguageModelProviders = [
