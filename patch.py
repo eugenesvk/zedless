@@ -18,6 +18,7 @@ parser = argparse.ArgumentParser(
     description='Patches Zed with focus on privacy and being local-first',
     epilog     ='')
 parser.add_argument('-s','--src',type=str,default="source",help="Path of the Zed's source code")
+parser.add_argument('-v','--verbose',action='store_true',help="Print more info when running")
 
 @contextmanager
 def editTomlDocument(file):
