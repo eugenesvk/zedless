@@ -70,6 +70,7 @@ CONFIG.bannedCrates = [
 
     "cloud_api_client","cloud_api_types","cloud_llm_client",
 
+    "edit_prediction","edit_prediction_cli","edit_prediction_context","edit_prediction_metrics","edit_prediction_types","edit_prediction_ui",
     # TBD
     "edit_predict","eval_cli","eval_utils",
 
