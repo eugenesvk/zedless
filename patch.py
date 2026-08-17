@@ -68,21 +68,27 @@ def runRules(rules):
         configFile.close()
         # HACK: some of our rules can be applied multiple times,
         # so run ast-grep until no more changes are applied
-        while True:
-            r = run([
-                "ast-grep", "scan", "--update-all",
-                "--config", configFile.name,
-                "--rule", "/dev/stdin",
-                "--color", "never",
-                "."
-            ], input="\n---\n".join([dumps(r) for r in rules]).encode(), capture_output=True)
-            output = r.stderr.decode()
-            if r.returncode != 0:
-                print(output)
-                exit(r.returncode)
-            if not (output.startswith("Applied ") and output.endswith(" changes\n")):
-                break
-            print(output.strip())
+        import sys
+        import tempfile
+        rules = "\n---\n".join([dumps(r) for r in rules]).encode()
+        with tempfile.NamedTemporaryFile(delete=False,delete_on_close=False) as ftmp:
+            ftmp.write(rules)
+            ftmp.flush(); ftmp.seek(0); ftmp.close()
+            while True:
+                r = run([
+                    "ast-grep", "scan", "--update-all",
+                    "--config", configFile.name,
+                    "--rule", ftmp.name,
+                    "--color", "never",
+                    "."
+                ], capture_output=True)
+                output = r.stderr.decode()
+                if r.returncode != 0:
+                    print(output)
+                    exit(r.returncode)
+                if not (output.startswith("Applied ") and output.endswith(" changes\n")):
+                    break
+                print(output.strip())
 
 def deletePatterns(target, language, patterns, selector=None):
     rule = {
