@@ -1260,7 +1260,6 @@ with chdir(args.src):
         run(["git","commit","-m","rules: 5 Remove menu actions/menu items"])
         rules = []
 
-    rules.extend(mkRule("crates/zed/src/zed/app_menus.rs", "rust", { "pattern": "\"Zed\"" }, "\"Zedless\""))
 
     rules.extend(mkRule("crates/settings_content/", "rust", {
         "kind": "enum_variant",
