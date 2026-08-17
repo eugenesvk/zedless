@@ -494,6 +494,10 @@ dir_main = os.path.dirname(os.path.realpath(__file__))
 with chdir(args.src):
     rules = []
 
+    if args.commit:
+        run(["git","add",".","-u"]) # add changed/deleted files, ignore new
+        run(["git","commit","-m",f"0: Modificaitons before Zedless patches"])
+
     cratesToDelete = []
     for crate in CONFIG.bannedCrates:
         if exists(f"crates/{crate}"):
