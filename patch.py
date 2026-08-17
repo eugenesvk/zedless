@@ -1233,13 +1233,6 @@ with chdir(zed_src):
         }
     }))
     for (originalActionName, actionName, url) in [
-        ("About Zed", "About Zedless", None),
-        ("Quit Zed", "Quit Zedless", None),
-        ("File Bug Report...", "File a bug report...", "https://github.com/zedless-editor/zedless/issues/new"),
-        ("Request Feature...", "Request a feature...", "https://github.com/zedless-editor/zedless/discussions/new?category=ideas"),
-        ("Documentation", "Documentation (zed.dev)", None),
-        ("Zed Repository", "Zedless Repository", "https://github.com/zedless-editor/zedless"),
-        ("Zed Twitter", "Zedless on Matrix", "https://matrix.to/#/#zedless:privatevoid.net"),
     ]:
         # HACK
         assert actionName != originalActionName
