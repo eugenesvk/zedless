@@ -69,6 +69,7 @@ CONFIG.bannedCrates = [
     "acp_thread","acp_tools",
 
     "cloud_api_client","cloud_api_types","cloud_llm_client",
+    "language_model","language_model_core","language_models",
 
     "edit_prediction","edit_prediction_cli","edit_prediction_context","edit_prediction_metrics","edit_prediction_types","edit_prediction_ui",
     # TBD
