@@ -19,6 +19,7 @@ parser = argparse.ArgumentParser(
     epilog     ='')
 parser.add_argument('-s','--src',type=str,default="source",help="Path of the Zed's source code")
 parser.add_argument('-v','--verbose',action='store_true',help="Print more info when running")
+parser.add_argument('-c','--commit',action='store_true',help="Commit modified/deleted after each stage")
 
 @contextmanager
 def editTomlDocument(file):
@@ -52,6 +53,10 @@ def mkRule(target, language, rule, fix):
     }
 
 def runRules(rules):
+    if not rules:
+        if args.verbose:
+            print('No rules to run!')
+        return
     astGrepConfig = {
         "languageInjections": [
             {
@@ -540,6 +545,9 @@ with chdir(args.src):
             tgt = Path(args.src) / 'crates' / crate
             print(f"del crate: {crate}\t@ {tgt}")
             shutil.rmtree(tgt, ignore_errors=True) #onexc=remove_readonly
+        if args.commit:
+            run(["git","add",".","-u"]) # add chagned/deleted files, ignore new
+            run(["git","commit","-m","✗ 1.2 Deleted Crates"])
 
         with editTomlDocument("Cargo.toml") as (data, write):
             data["workspace"]["members"] = list(filter(
@@ -577,6 +585,13 @@ with chdir(args.src):
                         if bin["name"] == "zed":
                             data["bin"][i]["name"] = "zedless"
                 write(data)
+        if args.commit:
+            run(["git","add",".","-u"]) # add changed/deleted files, ignore new
+            run(["git","commit","-m","✗ 1.2 Removed Deleted Crates from Cargo"])
+            runRules(rules)
+            run(["git","add",".","-u"]) # add changed/deleted files, ignore new
+            run(["git","commit","-m","✗ 1.3 Removed references to Deleted Crates from source files"])
+            rules = []
 
     for (crate, mod) in CONFIG.bannedModules:
         tgt_src = Path(args.src) / 'crates' / crate / 'src'
@@ -660,12 +675,22 @@ with chdir(args.src):
         tgt_mod += list(tgt_src.glob(f"*/{mod}.rs"))
         for tgt in tgt_mod:
             shutil.rmtree(tgt, ignore_errors=True) #onexc=remove_readonly
+        if args.commit:
+            run(["git","add",".","-u"])
+            run(["git","commit","-m","✗ 2a Deleted module files"])
+            runRules(rules)
+            run(["git","add",".","-u"]) # add changed/deleted files, ignore new
+            run(["git","commit","-m","✗ 2c Removed references to Deleted modules from source files"])
+            rules = []
 
     for provider in CONFIG.bannedLanguageModelProviders:
         tgt_src = Path(args.src) / 'crates' / 'language_models' / 'src' / 'provider'
         tgt = tgt_src / f"{provider.module}.rs"
         print(f"del language model provider: {provider.structPrefix} \t@ {tgt}")
         shutil.rmtree(tgt, ignore_errors=True) #onexc=remove_readonly
+        if args.commit:
+            run(["git","add",".","-u"]) # add chagned/deleted files, ignore new
+            run(["git","commit","-m","✗ 3a Deleted language model providers"])
         rules.extend(deletePatterns("crates/language_models/", "rust", [
             f"pub mod {provider.module};",
             f"use crate::provider::{provider.module}::$_;",
@@ -697,6 +722,11 @@ with chdir(args.src):
         ]))
         rules.extend(removeFieldsInDeclarations(provider.param, target="crates/language_models/"))
         rules.extend(removeExprArguments(provider.param, target="crates/language_models/"))
+        if args.commit:
+            runRules(rules)
+            run(["git","add",".","-u"]) # add changed/deleted files, ignore new
+            run(["git","commit","-m","✗ 3c Removed references to deleted Language module providers from source files"])
+            rules = []
 
     rules.extend(deleteDeclarations("struct_item", "OpenAiLanguageModelProvider", target="crates/language_models/"))
     rules.extend(deleteDeclarations("impl_item", "OpenAiLanguageModelProvider", identifierField="type", target="crates/language_models/"))
@@ -752,6 +782,11 @@ with chdir(args.src):
     for (crate, cfg) in CONFIG.perCrate.items():
         for enum in cfg.bannedEnums:
             rules.extend(deleteDeclarations("impl_item", f"{crate}::{enum}", identifierField="type"))
+    if args.commit:
+        runRules(rules)
+        run(["git","add",".","-u"])
+        run(["git","commit","-m","rules: 4.1 Remove Language model providers and Enums"])
+        rules = []
 
     for (target, cfg) in CONFIG.perDirectory.items():
         for function in cfg.bannedFunctions:
@@ -847,6 +882,11 @@ with chdir(args.src):
                     }
                 ]
             }))
+        if args.commit:
+            runRules(rules)
+            run(["git","add",".","-u"])
+            run(["git","commit","-m","rules: 4.2 Remove Functions"])
+            rules = []
 
         for struct in cfg.bannedStructs:
             rules.extend(deleteDeclarations("struct_item", struct, target=target))
@@ -855,6 +895,11 @@ with chdir(args.src):
             rules.extend(deletePatterns(target, "rust", [
                 f"{struct}::register($$$);",
             ]))
+        if args.commit:
+            runRules(rules)
+            run(["git","add",".","-u"])
+            run(["git","commit","-m","rules: 4.3 Remove Structs"])
+            rules = []
 
         for arg in cfg.bannedArguments:
             rules.extend(removeFieldsInDeclarations(arg, target=target))
@@ -878,6 +923,11 @@ with chdir(args.src):
                 f"self.{arg}.is_empty()",
                 f"self.{arg}.is_none()",
             ], "true", deleteStatements=False, target=target))
+        if args.commit:
+            runRules(rules)
+            run(["git","add",".","-u"])
+            run(["git","commit","-m","rules: 4.4 Remove Aarguments"])
+            rules = []
 
         for local in cfg.bannedLocals:
             rules.extend(deleteDeclarations("let_declaration", local, "pattern", target=target))
@@ -962,6 +1012,11 @@ with chdir(args.src):
                 "kind": "call_expression",
                 "pattern": f"{local}.as_ref().map($$$).or($$$OR).unwrap_or_default()"
             }, "($$$OR).unwrap_or_default()"))
+        if args.commit:
+            runRules(rules)
+            run(["git","add",".","-u"])
+            run(["git","commit","-m","rules: 4.5 Remove Locals"])
+            rules = []
 
         for action in cfg.bannedActions:
             rules.extend(removeMethodCall("register_action", {
@@ -1026,6 +1081,11 @@ with chdir(args.src):
                     })
                 }
             ]))
+        if args.commit:
+            runRules(rules)
+            run(["git","add",".","-u"])
+            run(["git","commit","-m","rules: 4.6 Remove Actions"])
+            rules = []
 
         for variant in cfg.bannedEnumVariants:
             scopedIdentifier = {
@@ -1084,6 +1144,11 @@ with chdir(args.src):
             rules.extend(deletePatterns(target, "rust", [
                 f"$_.push($_::{variant});",
             ], "expression_statement"))
+        if args.commit:
+            runRules(rules)
+            run(["git","add",".","-u"])
+            run(["git","commit","-m","rules: 4.7 Remove Enum variants"])
+            rules = []
 
         for enum in cfg.bannedEnums:
             rules.extend(deleteDeclarations("enum_item", enum, target=target))
@@ -1103,17 +1168,32 @@ with chdir(args.src):
                     }
                 }
             }))
+        if args.commit:
+            runRules(rules)
+            run(["git","add",".","-u"])
+            run(["git","commit","-m","rules: 4.8 Remove Enums"])
+            rules = []
 
         for function in cfg.disabledFunctions:
             rules.extend(disableAnyhowFunction(target, function))
             rules.extend(disableOptionFunction(target, function))
             rules.extend(disableBoolFunction(target, function))
             rules.extend(disableFutureAnyhowFunction(target, function))
+        if args.commit:
+            runRules(rules)
+            run(["git","add",".","-u"])
+            run(["git","commit","-m","rules: 4.9 Remove Functions"])
+            rules = []
 
         for (original, replacement) in cfg.stringReplacements:
             rules.extend(mkRule(target, "rust", {
                 "pattern": f"\"{original}\""
             }, f"\"{replacement}\""))
+        if args.commit:
+            runRules(rules)
+            run(["git","add",".","-u"])
+            run(["git","commit","-m","rules: 4.10 Removed strings"])
+            rules = []
 
     bannedMenuItemArgumentsSelector = {
         "kind": "token_tree",
@@ -1193,6 +1273,11 @@ with chdir(args.src):
                     }
                 }
             }, f"\"{actionName}\""))
+    if args.commit:
+        runRules(rules)
+        run(["git","add",".","-u"])
+        run(["git","commit","-m","rules: 5 Remove menu actions/menu items"])
+        rules = []
 
     rules.extend(mkRule("crates/zed/src/zed/app_menus.rs", "rust", { "pattern": "\"Zed\"" }, "\"Zedless\""))
 
@@ -1234,6 +1319,11 @@ with chdir(args.src):
     ]))
 
     rules.extend(removeMethodCall("child", match.rust.functionCall("render_telemetry_section"), target="crates/onboarding/"))
+    if args.commit:
+        runRules(rules)
+        run(["git","add",".","-u"])
+        run(["git","commit","-m","rules: 6 Remove settings content/telemetry/misc."])
+        rules = []
 
     # The `None` here is an Option<ActionLogTelemetry>, which was removed
     rules.extend(editAstAdvanced("crates/agent_ui/", "rust", [
@@ -1264,6 +1354,11 @@ with chdir(args.src):
             "stopBy": "end"
         }
     }, "{ None }"))
+    if args.commit:
+        runRules(rules)
+        run(["git","add",".","-u"])
+        run(["git","commit","-m","rules: 7 Remove agent/remote/misc."])
+        rules = []
 
     # Cleanup
     rules.extend(deletePatterns("crates/", "rust", [
@@ -1309,6 +1404,11 @@ with chdir(args.src):
     }, ""))
 
     runRules(rules)
+
+    if args.commit:
+        run(["git","add",".","-u"])
+        run(["git","commit","-m","rules: 8 Cleanup"])
+        rules = []
 
     src = Path(dir_main) / 'overlay' / '.'
     tgt = Path(args.src)
