@@ -1389,9 +1389,3 @@ with chdir(args.src):
         run(["git","add",".","-u"])
         run(["git","commit","-m","rules: 8 Cleanup"])
         rules = []
-
-    src = Path(dir_main) / 'overlay' / '.'
-    tgt = Path(args.src)
-    if args.verbose:
-        print(f"  {src}\n →{tgt}")
-    shutil.copytree(src,tgt,dirs_exist_ok=True)
