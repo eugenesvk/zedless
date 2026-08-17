@@ -57,6 +57,26 @@ class Config:
 
 CONFIG = Config()
 CONFIG.bannedCrates = [
+    # Collab
+    "collab","collab_ui",
+    "livekit_api","livekit_client",
+    "audio","denoise","rodio",
+    "channel",
+    "webrtc","aws_http_client","bedrock",
+
+    # AI
+    "agent","agent_servers","agent_settings","agent_skills","agent_ui",
+    "acp_thread","acp_tools",
+
+    "cloud_api_client","cloud_api_types","cloud_llm_client",
+
+    # TBD
+    "edit_predict","eval_cli","eval_utils",
+
+    "codestral","llama_cpp","ollama","zeta_prompt",
+    "open_ai","openai_subscribed",
+
+    # Original
     "ai_onboarding",
     "anthropic",
     "auto_update",
