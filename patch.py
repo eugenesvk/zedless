@@ -578,7 +578,8 @@ with chdir(args.src):
                         data["features"][feature] = filter(
                             lambda dep: all(
                                 [
-                                    not dep.startswith(f"{crate}/")
+                                    not (dep.startswith(f"{crate}/")
+                                    or   dep     == f"dep:{crate}"  )
                                     for crate in CONFIG.bannedCrates
                                 ],
                             ), data["features"][feature]
