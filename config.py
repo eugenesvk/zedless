@@ -59,10 +59,10 @@ CONFIG = Config()
 CONFIG.bannedCrates = [
     # Collab
     "collab","collab_ui",
-    "livekit_api","livekit_client",
+    "livekit","livekit_api","livekit_client",
     "audio","denoise","rodio","call",
     "channel",
-    "webrtc","aws_http_client","bedrock",
+    "libwebrtc","webrtc","aws_http_client","bedrock",
 
     # AI
     "agent","agent_servers","agent_settings","agent_skills","agent_ui",
