@@ -1179,7 +1179,7 @@ with chdir(zed_src):
         if args.commit and args.verbose:
             runRules(rules)
             run(["git","add",".","-u"])
-            run(["git","commit","-m",f"rules: 4.3 Remove per Directory items @{target}"])
+            run(["git","commit","-m",f"rules: 4.3 Remove per Directory items @ {target}"])
             rules = []
     if args.commit and not args.verbose:
         runRules(rules)
