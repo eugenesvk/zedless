@@ -592,11 +592,6 @@ with chdir(zed_src):
                         ))
                         if feat_filtered != data["features"][feature]:
                             data["features"][feature] = feat_filtered
-                if data["package"]["name"] == "zed":
-                    data["package"]["default-run"] = "zedless"
-                    for (i, bin) in enumerate(data["bin"]):
-                        if bin["name"] == "zed":
-                            data["bin"][i]["name"] = "zedless"
                 write(data)
         if args.commit:
             run(["git","add",".","-u"]) # add changed/deleted files, ignore new
