@@ -7,7 +7,7 @@ from subprocess import run
 from tempfile import NamedTemporaryFile
 from config import CONFIG
 
-import toml
+import tomlkit
 
 import match
 import match.rust
@@ -25,10 +25,10 @@ parser.add_argument('-c','--commit',action='store_true',help="Commit modified/de
 def editTomlDocument(file):
     def callback(v):
         with open(file, "w") as f:
-            toml.dump(v, f)
+            tomlkit.dump(v, f)
     value = None
     with open(file, "r") as f:
-        value = toml.load(f)
+        value = tomlkit.load(f)
     if value:
         yield value, callback
 
