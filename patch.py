@@ -575,7 +575,7 @@ with chdir(args.src):
                         del data["dev-dependencies"][crate]
                 if "features" in data:
                     for feature in data["features"]:
-                        data["features"][feature] = filter(
+                        feat_filtered = list(filter(
                             lambda dep: all(
                                 [
                                     not (dep.startswith(f"{crate}/")
@@ -583,7 +583,9 @@ with chdir(args.src):
                                     for crate in CONFIG.bannedCrates
                                 ],
                             ), data["features"][feature]
-                        )
+                        ))
+                        if feat_filtered != data["features"][feature]:
+                            data["features"][feature] = feat_filtered
                 if data["package"]["name"] == "zed":
                     data["package"]["default-run"] = "zedless"
                     for (i, bin) in enumerate(data["bin"]):
