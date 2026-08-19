@@ -491,7 +491,8 @@ args = parser.parse_args()
 import shutil
 import os
 dir_main = os.path.dirname(os.path.realpath(__file__))
-with chdir(args.src):
+zed_src = Path(args.src).absolute()
+with chdir(zed_src):
     rules = []
 
     if args.commit:
@@ -546,7 +547,7 @@ with chdir(args.src):
 
     if len(cratesToDelete) > 0:
         for crate in cratesToDelete:
-            tgt = Path(args.src) / 'crates' / crate
+            tgt = zed_src / 'crates' / crate
             print(f"del crate: {crate}\t@ {tgt}")
             shutil.rmtree(tgt, ignore_errors=True) #onexc=remove_readonly
         if args.commit:
@@ -601,7 +602,7 @@ with chdir(args.src):
             rules = []
 
     for (crate, mod) in CONFIG.bannedModules:
-        tgt_src = Path(args.src) / 'crates' / crate / 'src'
+        tgt_src = zed_src / 'crates' / crate / 'src'
         print("del mod:", crate, mod, f"\t@ {tgt_src}")
         rules.extend(deletePatterns(f"crates/{crate}/", "rust", [
             f"mod {mod};",
@@ -677,7 +678,7 @@ with chdir(args.src):
                 }
             }
         }))
-        tgt_src = Path(args.src) / 'crates' / crate / 'src'
+        tgt_src = zed_src / 'crates' / crate / 'src'
         tgt_mod =  [    tgt_src    /   f"{mod}.rs"]
         tgt_mod += list(tgt_src.glob(f"*/{mod}.rs"))
         for tgt in tgt_mod:
@@ -698,7 +699,7 @@ with chdir(args.src):
         rules = []
 
     for provider in CONFIG.bannedLanguageModelProviders:
-        tgt_src = Path(args.src) / 'crates' / 'language_models' / 'src' / 'provider'
+        tgt_src = zed_src / 'crates' / 'language_models' / 'src' / 'provider'
         tgt = tgt_src / f"{provider.module}.rs"
         print(f"del language model provider: {provider.structPrefix} \t@ {tgt}")
         shutil.rmtree(tgt, ignore_errors=True) #onexc=remove_readonly
@@ -1399,7 +1400,7 @@ with chdir(args.src):
         rules = []
 
     src = Path(dir_main) / 'overlay' / '.'
-    tgt = Path(args.src)
+    tgt = zed_src
     if args.verbose:
         print(f"  {src}\n →{tgt}")
     shutil.copytree(src,tgt,dirs_exist_ok=True)
