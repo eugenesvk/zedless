@@ -1407,3 +1407,7 @@ with chdir(zed_src):
     if args.verbose:
         print(f"  {src}\n →{tgt}")
     shutil.copytree(src,tgt,dirs_exist_ok=True)
+
+    if args.commit:
+        run(["git","add",".","-u"])
+        run(["git","commit","-m","9 copy icons"])
