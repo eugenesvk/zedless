@@ -520,6 +520,7 @@ with chdir(zed_src):
                 }
             }
         }))
+    cratesToDelete = set(cratesToDelete) # for faster 'in set' matches
 
     crateIdentifiers = [{ "pattern": crate } for crate in CONFIG.bannedCrates]
     rules.extend(mkRule("crates/", "rust", {
@@ -555,10 +556,12 @@ with chdir(zed_src):
             run(["git","commit","-m","✗ 1.2 Deleted Crates"])
 
         with editTomlDocument("Cargo.toml") as (data, write):
-            data["workspace"]["members"] = list(filter(
-                lambda m: m.removeprefix("crates/") not in cratesToDelete,
-                data["workspace"]["members"]
-            ))
+            arr = data["workspace"]["members"]
+            for i in range(len(arr)):
+                j = len(arr) - i - 1
+                if arr[j].removeprefix("crates/") in cratesToDelete:
+                    del arr[j]
+            data["workspace"]["members"] = arr
             for crate in cratesToDelete:
                 if crate in data["workspace"]["dependencies"]:
                     del data["workspace"]["dependencies"][crate]
