@@ -24,7 +24,7 @@ parser.add_argument('-c','--commit',action='store_true',help="Commit modified/de
 @contextmanager
 def editTomlDocument(file):
     def callback(v):
-        with open(file, "w") as f:
+        with open(file, "w", newline='') as f:
             tomlkit.dump(v, f)
     value = None
     with open(file, "r") as f:
