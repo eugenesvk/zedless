@@ -17,7 +17,7 @@ parser = argparse.ArgumentParser(
     prog       ='Zedless Patch',
     description='Patches Zed with focus on privacy and being local-first',
     epilog     ='')
-parser.add_argument('-s','--src',type=str,default="source",help="Path of the Zed's source code")
+parser.add_argument('-s','--src',type=str,default="source",help="Path to Zed's source code")
 parser.add_argument('-v','--verbose',action='store_true',help="Print more info when running")
 parser.add_argument('-c','--commit',action='store_true',help="Commit modified/deleted after each stage")
 
@@ -496,7 +496,7 @@ with chdir(args.src):
 
     if args.commit:
         run(["git","add",".","-u"]) # add changed/deleted files, ignore new
-        run(["git","commit","-m",f"0: Modificaitons before Zedless patches"])
+        run(["git","commit","-m",f"0: Modifications before Zedless patches"])
 
     cratesToDelete = []
     for crate in CONFIG.bannedCrates:
@@ -550,7 +550,7 @@ with chdir(args.src):
             print(f"del crate: {crate}\t@ {tgt}")
             shutil.rmtree(tgt, ignore_errors=True) #onexc=remove_readonly
         if args.commit:
-            run(["git","add",".","-u"]) # add chagned/deleted files, ignore new
+            run(["git","add",".","-u"]) # add changed/deleted files, ignore new
             run(["git","commit","-m","✗ 1.2 Deleted Crates"])
 
         with editTomlDocument("Cargo.toml") as (data, write):
@@ -734,7 +734,7 @@ with chdir(args.src):
         rules.extend(removeFieldsInDeclarations(provider.param, target="crates/language_models/"))
         rules.extend(removeExprArguments(provider.param, target="crates/language_models/"))
     if args.commit:
-        run(["git","add",".","-u"]) # add chagned/deleted files, ignore new
+        run(["git","add",".","-u"]) # add changed/deleted files, ignore new
         run(["git","commit","-m","✗ 3.1 Deleted language model providers"])
         runRules(rules)
         run(["git","add",".","-u"])
