@@ -1393,9 +1393,9 @@ with chdir(zed_src):
 
     src = Path(dir_main) / 'overlay' / '.'
     tgt = zed_src
-    if args.verbose:
-        print(f"  {src}\n →{tgt}")
-    shutil.copytree(src,tgt,dirs_exist_ok=True)
+    # if args.verbose:
+        # print(f"  {src}\n →{tgt}")
+    # shutil.copytree(src,tgt,dirs_exist_ok=True)
 
     if args.commit:
         run(["git","add",".","-u"])
