@@ -520,7 +520,7 @@ with chdir(zed_src):
                 }
             }
         }))
-    cratesToDelete = set(cratesToDelete) # for faster 'in set' matches
+    cratesToRemove = set(CONFIG.bannedCrates) # External imports also need to be removed from the manifest, so don't just include banned crates that are removed locally
 
     crateIdentifiers = [{ "pattern": crate } for crate in CONFIG.bannedCrates]
     rules.extend(mkRule("crates/", "rust", {
@@ -555,14 +555,15 @@ with chdir(zed_src):
             run(["git","add",".","-u"]) # add changed/deleted files, ignore new
             run(["git","commit","-m","✗ 1.2 Deleted Crates"])
 
+    if len(cratesToRemove) > 0:
         with editTomlDocument("Cargo.toml") as (data, write):
             arr = data["workspace"]["members"]
             for i in range(len(arr)):
                 j = len(arr) - i - 1
-                if arr[j].removeprefix("crates/") in cratesToDelete:
+                if arr[j].removeprefix("crates/") in cratesToRemove:
                     del arr[j]
             data["workspace"]["members"] = arr
-            for crate in cratesToDelete:
+            for crate in cratesToRemove:
                 if crate in data["workspace"]["dependencies"]:
                     del data["workspace"]["dependencies"][crate]
                 for prof in data["profile"]:
@@ -572,7 +573,7 @@ with chdir(zed_src):
 
         for manifest in glob("crates/*/Cargo.toml"):
             with editTomlDocument(manifest) as (data, write):
-                for crate in cratesToDelete:
+                for crate in cratesToRemove:
                     if "dependencies" in data and crate in data["dependencies"]:
                         del data["dependencies"][crate]
                     if "dev-dependencies" in data and crate in data["dev-dependencies"]:
@@ -584,7 +585,7 @@ with chdir(zed_src):
                                 [
                                     not (dep.startswith(f"{crate}/")
                                     or   dep     == f"dep:{crate}"  )
-                                    for crate in CONFIG.bannedCrates
+                                    for crate in cratesToRemove
                                 ],
                             ), data["features"][feature]
                         ))
