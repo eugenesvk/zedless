@@ -558,8 +558,9 @@ with chdir(zed_src):
     if len(cratesToRemove) > 0:
         with editTomlDocument("Cargo.toml") as (data, write):
             arr = data["workspace"]["members"]
-            for i in range(len(arr)):
-                j = len(arr) - i - 1
+            m_cnt = len(arr)
+            for i in range(m_cnt):
+                j = m_cnt - i - 1
                 if arr[j].removeprefix("crates/") in cratesToRemove:
                     del arr[j]
             data["workspace"]["members"] = arr
